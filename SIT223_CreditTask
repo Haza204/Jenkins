@@ -1,0 +1,105 @@
+pipeline {
+    agent any
+    //start of pipeline
+    
+    stages{
+        //Start of the stage
+        stage ('First Stage: Build'){
+            steps{
+            //This is where the code will be built with Maven
+            //An example would be command : sh 'mvn clean package'
+            echo 'The code is being built by using Maven'
+            //of course this echo command would not be in use, the actual command would be
+            }
+        }
+        
+        stage ('Second Stage: Unit and Integration Tests'){
+            steps{
+                //This is where the unit tests will be done, using JUnit and Selenium
+                //An example of this code would be sh 'mvn test'
+                echo 'the tests of the unit are running by Selenium and JUnit'
+                //of course this will be replaced by the actual command
+            }
+        }
+        
+        post {
+            success{
+                emailext attachlog: true,
+                to: 'hwatycha@deakin.edu.au',
+                subject: 'CI/CD stauts - The Test Stage has been a SUCCESS',
+                body: 'Well done! The Unit and Integration Tests have been completed successfully'
+            }
+            
+            failure {
+                emailext attachlog: true,
+                to: 'hwatycha@deakin.edu.au',
+                subject: 'CI/CD stauts - The Test Stage has been a FAILURE',
+                body: 'Bad Luck! The Unit and Integration Tests has failed, please review this'
+            }
+        }
+    }
+    
+    //Now we go back to the remaining steps
+    stage('Stage 3: The code Analysis'){
+        steps{
+            //We would integrate the code tool like SonarQube
+            //Ex: sh 'sonar-scanner'
+            echo 'Running the code analysis using the tool SonarQube'
+            //of course this will be replaced by the actual command
+        }
+    }
+    
+    stage ('Stage 4:The Security Scan'){
+        steps{
+            //This is the part of the code where we would implement a security scan using OWASP ZAP
+            //EX: sh 'zap-cli --spider <target_url>'
+            echo 'The scan is now running, using OWASP ZAP'
+            //of course this will be replaced by the actual command
+        }
+        
+        post {
+            success {
+                emailext body: "Security Scan has been completed, well done!",
+                subject: "CI/CD Status- The security Scan stage has been completed correctly",
+                to: "hwatycha@deakin.edu.au",
+                attachlog: true,
+            }
+            
+            failure{
+                emailext body: "Security Scan has failed, please review!",
+                subject: "CI/CD Status- The security Scan stage has failed!",
+                to: "hwatycha@deakin.edu.au",
+                attachlog: true,
+            }
+        }
+    }
+    
+    stage('Stage five: Deploy to the staging'){
+        steps{
+            //this will deploy the application to our staging server using the tool AWS CLI
+            //An example of this step would be sh 'aws ec2 deploy <staging_tool>_id'
+            echo 'We are now deploying the application using aws CLI'
+            //of course this will be replaced by the actual command
+        }
+    }
+    
+    stage ('Stage Six: The Integration Test on Staging'){
+        steps {
+            //this is where the integration tests begin on the staging envirnoment
+            //An example of the code being run would be sh 'mvn integration-tests'
+            echo 'Running integration tests on the staging envirnoment'
+            //of course this will be replaced by the actual command
+        }
+    }
+    
+    stage ('Stage Seven: The Deploy to Production'){
+        steps {
+            //This is where the deploy to production would be 
+            //An example of the code would look like sh 'aws ec2 deploy <production_instance_id>'
+            echo 'Deploying the application to production server using aws'
+            //of course this will be replaced by the actual command
+            
+        }
+    }
+    
+}
